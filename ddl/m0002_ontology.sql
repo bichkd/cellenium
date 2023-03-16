@@ -1,35 +1,40 @@
 CREATE TABLE ontology (
-  ontid int  PRIMARY KEY,
-  name  text
+  ontology_id int4 PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  name        text NOT NULL
 );
 
+-- TODO function of ont_code (dmitri)
+-- TODO foreign key cascade behavior (dmitri)
 CREATE TABLE concept (
-  cid            serial   PRIMARY KEY,
-  ontid          int      REFERENCES ontology,
-  ont_code       text,
-  label          text
+  concept_id  int4 PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  ontology_id int4 NOT NULL REFERENCES ontology,
+  ont_code    text,
+  label       text
   -- TODO (dmitri)
   -- label_tsvector tsvector GENERATED ALWAYS AS (to_tsvector('english', label)) STORED
 );
 
-CREATE UNIQUE INDEX concept_i1 ON concept (ontid, ont_code);
-CREATE INDEX concept_i2 ON concept (lower(label), ontid, cid);
+CREATE UNIQUE INDEX ON concept (ontology_id, ont_code);
 
+-- TODO 'concept_id' adds nothing to the index; and likely ontology_id, too (dmitri)
+CREATE INDEX ON concept (lower(label), ontology_id, concept_id);
+
+-- TODO not my favorite structure: either an array field on 'concept' or a proper synonym entity
 CREATE TABLE concept_synonym (
-  cid              int NOT NULL REFERENCES concept,
-  synonym          text
+  concept_id int4 NOT NULL REFERENCES concept,
+  synonym    text NOT NULL
   -- TODO (dmitri)
   -- synonym_tsvector tsvector GENERATED ALWAYS AS (to_tsvector('english', synonym)) STORED
 );
 
-CREATE INDEX concept_synonym_i1 ON concept_synonym (cid);
+CREATE INDEX ON concept_synonym (concept_id);
 
 CREATE TABLE concept_hierarchy (
-  cid        int REFERENCES concept,
-  parent_cid int REFERENCES concept
+  concept_id int4 REFERENCES concept,
+  parent_id  int4 REFERENCES concept
 );
 
 -- alternative: store the full parent-path(s) for each cid using the ltree data type, see e.g.
 -- https://hoverbear.org/blog/postgresql-hierarchical-structures/
-CREATE UNIQUE INDEX concept_hierarchy_i1 ON concept_hierarchy (cid, parent_cid);
-CREATE UNIQUE INDEX concept_hierarchy_i2 ON concept_hierarchy (parent_cid, cid);
+CREATE UNIQUE INDEX ON concept_hierarchy (concept_id, parent_id);
+CREATE UNIQUE INDEX ON concept_hierarchy (parent_id, concept_id);

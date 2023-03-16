@@ -23,7 +23,7 @@ CREATE OR REPLACE VIEW study_sample_annotation_subsampling AS
 SELECT
 ssa.study_id,
 ssa.annotation_value_id,
-array_agg(distinct ssp.study_sample_id) study_sample_ids
+array_agg(DISTINCT ssp.study_sample_id) study_sample_ids
 FROM study_sample_annotation ssa
 CROSS JOIN unnest(ssa.study_sample_ids) sample_id
 JOIN study_sample_projection ssp ON ssp.study_id = ssa.study_id AND ssp.study_sample_id = sample_id

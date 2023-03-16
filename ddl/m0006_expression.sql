@@ -1,17 +1,15 @@
 
 CREATE TABLE differential_expression  (
-  study_id            int NOT NULL,
-  omics_id            int NOT NULL REFERENCES omics_base,
+  study_id            int4 NOT NULL REFERENCES study ON DELETE CASCADE,
+  omics_id            int4 NOT NULL REFERENCES omics_base,
   -- differential expression of this group (sample's annotation_value_id) vs. all other groups
-  annotation_value_id int NOT NULL,
-  pvalue              float,
-  pvalue_adj          float,
-  score               float,
-  log2_foldchange     float,
-  CONSTRAINT fk_study_id FOREIGN KEY (study_id) REFERENCES study (study_id) ON DELETE CASCADE,
-  CONSTRAINT fk_sample_annotation_value FOREIGN KEY (annotation_value_id) REFERENCES annotation_value (annotation_value_id)
+  annotation_value_id int4 NOT NULL REFERENCES annotation_value,
+  pvalue              float4,
+  pvalue_adj          float4,
+  score               float4,
+  log2_foldchange     float4,
+  UNIQUE (study_id, annotation_value_id, omics_id)
 );
-CREATE UNIQUE INDEX differential_expression_i1 ON differential_expression (study_id, annotation_value_id, omics_id);
 
 -- TODO (dmitri)
 -- CREATE OR REPLACE VIEW differential_expression_v
@@ -24,16 +22,13 @@ CREATE UNIQUE INDEX differential_expression_i1 ON differential_expression (study
 -- grant select ON differential_expression_v to postgraphile;
 
 
-
 CREATE TABLE expression (
-  study_layer_id   int       NOT NULL,
-  omics_id         int       NOT NULL REFERENCES omics_base,
+  study_layer_id   int4   NOT NULL REFERENCES study_layer ON DELETE CASCADE,
+  omics_id         int4   NOT NULL REFERENCES omics_base,
   -- for sparse data, REFERENCES study_sample.study_sample_id
-  study_sample_ids integer[] NOT NULL,
-  values           real[]    NOT NULL,
-  CONSTRAINT fk_study_layer_id FOREIGN KEY (study_layer_id) REFERENCES study_layer (study_layer_id) ON DELETE CASCADE
+  study_sample_ids int4[] NOT NULL,
+  values           real[] NOT NULL
 );
-
 
 -- TODO (dmitri)
 -- partition by list (study_layer_id);
