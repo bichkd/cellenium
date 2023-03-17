@@ -1,3 +1,4 @@
+-- TODO import tracking belongs in its own table (dmitri)
 CREATE TABLE study (
   study_id           int4 PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   name               text NOT NULL,
@@ -48,31 +49,34 @@ CREATE TABLE study_annotation_group_ui (
 );
 
 -- TODO how is 'study_sample_id' assigned? (dmitri)
-CREATE TABLE study_sample (
+CREATE TABLE sample (
+  sample_id       int4 NOT NULL,
   study_id        int4 NOT NULL REFERENCES study ON DELETE CASCADE,
-  study_sample_id int4 NOT NULL,
   h5ad_obs_index  int4 NOT NULL,
   h5ad_obs_key    text NOT NULL,
-  PRIMARY KEY (study_id, study_sample_id)
+  PRIMARY KEY (study_id, sample_id) -- TODO not a fan of compound primary keys (dmitri)
 );
 
-CREATE TABLE study_sample_projection (
+-- TODO needs a primary key
+-- ... or is this a value table?
+CREATE TABLE projection (
   study_id            int4   NOT NULL,
-  study_sample_id     int4   NOT NULL,
+  sample_id           int4   NOT NULL,
   projection_type     text   NOT NULL,
   modality            text,
   projection          real[] NOT NULL, -- TODO non-null containers not usually meaningful (dmitri)
   -- subsampling reduces overlapping points in a projection
   display_subsampling bool   NOT NULL,
-  FOREIGN KEY (study_id, study_sample_id) REFERENCES study_sample (study_id, study_sample_id) ON DELETE CASCADE
+  FOREIGN KEY (study_id, sample_id) REFERENCES sample (study_id, sample_id) ON DELETE CASCADE
 );
 
 
-CREATE TABLE study_sample_annotation (
-  study_id            int4  NOT NULL REFERENCES study ON DELETE CASCADE,
-  annotation_value_id int4  NOT NULL REFERENCES annotation_value,
+-- TODO likely not a great use of array (dmitri)
+CREATE TABLE sample_annotation (
+  study_id            int4   NOT NULL REFERENCES study ON DELETE CASCADE,
+  annotation_value_id int4   NOT NULL REFERENCES annotation_value,
   -- the samples that are annotated with that value, e.g. that specific cell type
-  study_sample_ids    int[] NOT NULL,
+  sample_ids          int4[] NOT NULL,
   color               text,
   UNIQUE (study_id, annotation_value_id)
 );

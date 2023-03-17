@@ -26,8 +26,8 @@ CREATE TABLE expression (
   study_layer_id   int4   NOT NULL REFERENCES study_layer ON DELETE CASCADE,
   omics_id         int4   NOT NULL REFERENCES omics_base,
   -- for sparse data, REFERENCES study_sample.study_sample_id
-  study_sample_ids int4[] NOT NULL,
-  values           real[] NOT NULL
+  sample_ids       int4[] NOT NULL,
+  values           float4[] NOT NULL
 );
 
 -- TODO (dmitri)

@@ -7,9 +7,9 @@ SELECT
 study_id,
 projection_type,
 modality,
-array_agg(study_sample_id ORDER BY study_sample_id) AS study_sample_id,
-array_agg(projection ORDER BY study_sample_id) AS projection
-FROM study_sample_projection
+array_agg(sample_id ORDER BY sample_id) AS sample_id,
+array_agg(projection ORDER BY sample_id) AS projection
+FROM projection
 WHERE display_subsampling = true
 GROUP BY study_id, projection_type, modality
 ;
@@ -23,11 +23,11 @@ CREATE OR REPLACE VIEW study_sample_annotation_subsampling AS
 SELECT
 ssa.study_id,
 ssa.annotation_value_id,
-array_agg(DISTINCT ssp.study_sample_id) study_sample_ids
-FROM study_sample_annotation ssa
-CROSS JOIN unnest(ssa.study_sample_ids) sample_id
-JOIN study_sample_projection ssp ON ssp.study_id = ssa.study_id AND ssp.study_sample_id = sample_id
-WHERE ssp.display_subsampling = True
+array_agg(DISTINCT ssp.sample_id) sample_ids
+FROM sample_annotation ssa
+CROSS JOIN unnest(ssa.sample_ids) q_sample_id
+JOIN projection ssp ON ssp.study_id = ssa.study_id AND ssp.sample_id = q_sample_id
+WHERE ssp.display_subsampling = true
 GROUP BY ssa.study_id, ssa.annotation_value_id
 ;
 
