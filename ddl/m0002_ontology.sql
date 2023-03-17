@@ -9,13 +9,11 @@ CREATE TABLE concept (
   concept_id  int4 PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   ontology_id int4 NOT NULL REFERENCES ontology,
   ont_code    text,
-  label       text
+  label       text,
   -- TODO (dmitri)
   -- label_tsvector tsvector GENERATED ALWAYS AS (to_tsvector('english', label)) STORED
+  UNIQUE (ontology_id, ont_code) -- TODO unique on nullable
 );
-
-CREATE UNIQUE INDEX ON concept (ontology_id, ont_code);
-
 -- TODO 'concept_id' adds nothing to the index; and likely ontology_id, too (dmitri)
 CREATE INDEX ON concept (lower(label), ontology_id, concept_id);
 
@@ -26,15 +24,13 @@ CREATE TABLE concept_synonym (
   -- TODO (dmitri)
   -- synonym_tsvector tsvector GENERATED ALWAYS AS (to_tsvector('english', synonym)) STORED
 );
-
 CREATE INDEX ON concept_synonym (concept_id);
-
-CREATE TABLE concept_hierarchy (
-  concept_id int4 REFERENCES concept,
-  parent_id  int4 REFERENCES concept
-);
 
 -- alternative: store the full parent-path(s) for each cid using the ltree data type, see e.g.
 -- https://hoverbear.org/blog/postgresql-hierarchical-structures/
-CREATE UNIQUE INDEX ON concept_hierarchy (concept_id, parent_id);
-CREATE UNIQUE INDEX ON concept_hierarchy (parent_id, concept_id);
+CREATE TABLE concept_hierarchy (
+  concept_id int4 REFERENCES concept,
+  parent_id  int4 REFERENCES concept,
+  UNIQUE (concept_id, parent_id)
+);
+CREATE INDEX ON concept_hierarchy (parent_id);
