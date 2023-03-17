@@ -1,0 +1,18 @@
+ichkd@bichkd-x1:~/w/cellenium:main$ flyway info                                                                                                                                       (base) 
+Flyway Community Edition 9.16.0 by Redgate
+See release notes here: https://rd.gt/416ObMi
+
+Database: jdbc:postgresql://cscoe-db.pfizer.com/test (PostgreSQL 11.4)
+Schema version: 0006
+
++-----------+---------+-------------+------+---------------------+---------+----------+
+| Category  | Version | Description | Type | Installed On        | State   | Undoable |
++-----------+---------+-------------+------+---------------------+---------+----------+
+| Versioned | 0001    | base        | SQL  | 2023-03-16 20:10:02 | Success | No       |
+| Versioned | 0002    | ontology    | SQL  | 2023-03-16 20:10:02 | Success | No       |
+| Versioned | 0003    | study       | SQL  | 2023-03-16 20:10:40 | Success | No       |
+| Versioned | 0004    | study views | SQL  | 2023-03-16 20:12:58 | Success | No       |
+| Versioned | 0005    | omics       | SQL  | 2023-03-16 20:12:59 | Success | No       |
+| Versioned | 0006    | expression  | SQL  | 2023-03-16 20:12:59 | Success | No       |
++-----------+---------+-------------+------+---------------------+---------+----------+
+
